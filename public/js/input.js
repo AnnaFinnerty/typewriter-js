@@ -14,6 +14,7 @@ class Input{
         this.awake();
     }
     awake(){
+        console.log('app awake');
         this.typewriter = document.getElementById('typewriter').getSVGDocument();
         //add keydown clickhandler
         window.addEventListener('keydown',(e)=>{
