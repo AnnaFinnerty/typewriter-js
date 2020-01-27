@@ -1,0 +1,77 @@
+/* 
+font-family: 'Rock Salt', cursive;
+font-family: 'Bitter', serif; 
+*/
+
+body{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* background: rgb(253, 245, 245) */
+    background: radial-gradient(rgb(92, 1, 92),rgb(92, 1, 92),rgb(92, 1, 92) ,rgb(35, 2, 38)); 
+    /* box-shadow: inset 0px 0px 8px 5px rgb(35, 2, 38); */
+}
+
+header{
+    width: 100vw;
+    background: rgba(35, 2, 38,.8);
+    display: inline-flex;
+    margin: 2vh 0;
+}
+
+h1{
+    font-family: 'Rock Salt', cursive;
+    width: 40vw;
+    text-align: center;
+    margin: 0;
+    /* color: rgb(59, 78, 20); */
+    
+    color: rgb(97, 133, 27);
+}
+
+.inline-flex-center{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+}
+
+#text-container{
+   position: absolute;
+   margin-left: 55vw;
+   margin-top: 45vh;
+}
+
+#modal{
+    width: 100vw;
+    height: 110vh;
+    background: rgba(0,0,0,.7);
+    position: fixed;
+    margin-top: -100vh;
+}
+
+#modal-window{
+    width: 80vw;
+    height: 80vh;
+    background: gainsboro;
+    border-radius: 5%;
+    margin: 20vh auto;
+}
+
+#close-modal-button{
+    margin: 5vh;
+    float: right;
+    border-radius: 100%;
+    padding: 1vh;
+}
+
+#typewriter{
+    margin: 0 auto;
+    width: 50vw;
+    height: 50%;
+}
+
+.hidden{
+    display: none;
+}
