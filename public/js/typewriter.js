@@ -115,7 +115,7 @@ class Typewriter{
         console.log('new line');
         //ding!
         this.audio.bell.play();
-        this.paperHeight -= .1;
+        this.paperHeight += .1;
         this.currentPage.push(this.currentLine);
         this.currentLine = "";
         this.print(this.currentLine);
