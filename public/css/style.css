@@ -1,7 +1,3 @@
-/* 
-font-family: 'Rock Salt', cursive;
-font-family: 'Bitter', serif; 
-*/
 
 body{
     width: 100vw;
@@ -9,6 +5,7 @@ body{
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-family: 'Special Elite', 'Courier',serif;
     /* background: rgb(253, 245, 245) */
     background: radial-gradient(rgb(92, 1, 92),rgb(92, 1, 92),rgb(92, 1, 92) ,rgb(35, 2, 38)); 
     /* box-shadow: inset 0px 0px 8px 5px rgb(35, 2, 38); */
@@ -16,9 +13,9 @@ body{
 
 header{
     width: 100vw;
-    background: rgba(35, 2, 38,.8);
     display: inline-flex;
-    margin: 2vh 0;
+    text-align: center;
+    position: fixed;
 }
 
 h1{
@@ -37,34 +34,13 @@ h1{
     align-content: center;
 }
 
-#text-container{
+/* #text-container{
    position: absolute;
-   margin-left: 55vw;
-   margin-top: 45vh;
-}
-
-#modal{
-    width: 100vw;
-    height: 110vh;
-    background: rgba(0,0,0,.7);
-    position: fixed;
-    margin-top: -100vh;
-}
-
-#modal-window{
-    width: 80vw;
-    height: 80vh;
-    background: gainsboro;
-    border-radius: 5%;
-    margin: 20vh auto;
-}
-
-#close-modal-button{
-    margin: 5vh;
-    float: right;
-    border-radius: 100%;
-    padding: 1vh;
-}
+   background: red;
+   height: 50vh;
+   margin-top: -50vh;
+   width:20%
+} */
 
 #typewriter{
     margin: 0 auto;
@@ -74,4 +50,12 @@ h1{
 
 .hidden{
     display: none;
+}
+
+.icon{
+    width: 5vw;
+    height: 5vw;
+    color: white;
+    padding: 1vw;
+    margin: 1vw;
 }
