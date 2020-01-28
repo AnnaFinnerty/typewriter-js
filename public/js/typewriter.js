@@ -10,13 +10,14 @@ class Typewriter{
         this.ribbon = this.typewriter.getElementById('ribbon');
         this.textContainer = this.typewriter.getElementById('text');
         this.textContainer.width = "100px";
-        this.text = this.textContainer.firstChild;
+        this.text = this.textContainer.lastChild;
         this.text.style.fontFamily = "'Special Elite', 'Courier',serif";
         this.text.textContent = "test text";
         this.currentLine = "";
-        this.maxCharsPerLine = 25;
+        this.currentChar = 0;
+        this.maxChars = 14;
         this.currentPage = [];
-        this.linesOnPages = 25;
+        this.maxLinesOnPages = 25;
         this.textPosition = {
             x: "50vw",
             y: "70vh"
@@ -26,7 +27,7 @@ class Typewriter{
         this.audio = {
             'bell': document.querySelector('#bell')
         }
-        this.displayedText = document.querySelector('#text-container');
+        // this.displayedText = document.querySelector('#text-container');
         this.awake();
     }
     awake(){
@@ -67,17 +68,19 @@ class Typewriter{
         //temp fix until correct way of getting offset can be determined
         this.paperMax = this.paperMin + width * -1;
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
-        this.displayedText.style.transform = "translate("+this.centerX+"px,"+this.centerY+"px)";
+        // this.displayedText.style.transform = "translate("+this.centerX+"px,"+this.centerY+"px)";
     }
     type = (key,time) => {
         //use time to play sound
         console.log('typing!');
-        if(this.currentPos - this.charWidth > this.paperMax){
+        if(this.currentChar - 1 <= this.maxChars){
+            this.currentChar += 1;
             this.currentPos -= this.charWidth;
             this.currentLine += key;
             this.depressKey(key);
             this.print(this.currentLine);
         } else {
+            this.currentChar = 0;
             this.currentPos = this.paperMin;
             this.nextLine();
         }
@@ -112,8 +115,10 @@ class Typewriter{
         console.log('new line');
         //ding!
         this.audio.bell.play();
-        this.paperHeight += .1;
+        this.paperHeight -= .1;
         this.currentPage.push(this.currentLine);
+        this.currentLine = "";
+        this.print(this.currentLine);
         const paperY = -9*this.paperHeight;
         this.paper.style.transform = "translate(0,"+paperY+"px) scale(1,"+this.paperHeight+")";
         
