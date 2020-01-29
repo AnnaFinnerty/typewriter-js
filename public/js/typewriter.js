@@ -1,3 +1,4 @@
+
 class Typewriter{
     constructor(){
         this.input = new Input(this.type,this.nextLine,this.depressKey); 
@@ -8,30 +9,22 @@ class Typewriter{
         this.movableOnType = this.typewriter.getElementById('layer18');
         this.paper = this.typewriter.getElementById('paper');
         this.ribbon = this.typewriter.getElementById('ribbon');
-        this.textContainer = this.typewriter.getElementById('text');
-        this.textContainer.width = "100px";
-        this.text = this.textContainer.lastChild;
-        this.text.style.fontFamily = "'Special Elite', 'Courier',serif";
-        this.text.textContent = "test text";
-        this.currentLine = "";
+        this.currentText = "";
+        this.currentLine = 0;
         this.currentChar = 0;
         this.maxChars = 14;
         this.currentPage = [];
-        this.maxLinesOnPages = 25;
-        this.textPosition = {
-            x: "50vw",
-            y: "70vh"
-        }
+        this.maxLinesOnPages = 15;
         this.keys = {}
         this.hammers = {}
+        this.textLines = []
         this.audio = {
             'bell': document.querySelector('#bell')
         }
-        // this.displayedText = document.querySelector('#text-container');
         this.awake();
     }
     awake(){
-        //find keysObjs in svg and store ref and position calc in keys obj
+        //find keysObjs and hammerObjs in svg and store ref and position calc in keys obj
         for(let i = 0; i < activeKeys.length; i++){
             const keyObj = this.typewriter.getElementById(activeKeys[i]+"-key");
             this.keys[activeKeys[i]] = {};
@@ -43,25 +36,37 @@ class Typewriter{
                 x: keyX,
                 y: keyY
             }
+            try{
+                const hammerObj = this.typewriter.getElementById(activeKeys[i]+"-hammer");
+                if(hammerObj){
+                    console.log(hammerObj);
+                }
+                this.hammers[activeKeys[i]] = {};
+                this.hammers[activeKeys[i]]['obj'] = hammerObj;
+                const hTransform = hammerObj.getAttribute("transform").split(",");
+                const hammerX = Number(hTransform[0].split("(")[1]);
+                const hammerY = Number(hTransform[1].split(")")[0]);
+                this.hammers[activeKeys[i]]['pos'] = {
+                    x: hammerX,
+                    y: hammerY
+                }
+            }catch(e){}
         }
+        console.log('hammers',this.hammers)
 
-        //find start position for text container
-        // console.log(this.paper);
-        // const transform = this.paper.getAttribute("x");
-        // const paperX = Number(transform);
-        // console.log('paperX',paperX)
+        //load text lines on paper
+        for(let i = 0; i < this.maxLinesOnPages; i++){
+            const textObj = this.typewriter.getElementById('text'+i).firstChild;
+            console.log(textObj);
+            textObj.style.fontFamily = "'Special Elite', 'Courier',serif";
+            textObj.style.textSize = "12px";
+            textObj.textContent = "";
+            this.textLines.push(textObj)
+        }
 
         this.centerX = window.innerWidth/2;
         this.centerY = window.innerHeight/2 - 40;
-
-        const paperX = Number(this.paper.getAttribute("x"));
-        // const paperWidth = Number(this.paper.getAttribute("width"));
-        const paperY = Number(this.paper.getAttribute("y"));
-        // const paperHeight = Number(this.paper.getAttribute("height"));
        
-        // this.displayedText.style.width = paperWidth + "px";
-        // this.displayedText.style.height = paperHeight + "px";
-
         this.paperMin = Number(this.paper.getAttribute("x")) *.45;
         this.currentPos = this.paperMin;
         const width = Number(this.paper.getAttribute("width"));
@@ -71,42 +76,38 @@ class Typewriter{
         // this.displayedText.style.transform = "translate("+this.centerX+"px,"+this.centerY+"px)";
     }
     type = (key,time) => {
-        //use time to play sound
+        //MTC use time to play sound
         console.log('typing!');
         if(this.currentChar - 1 <= this.maxChars){
             this.currentChar += 1;
             this.currentPos -= this.charWidth;
-            this.currentLine += key;
+            this.currentText += key;
             this.depressKey(key);
-            this.print(this.currentLine);
+            this.print(this.currentText);
         } else {
             this.currentChar = 0;
             this.currentPos = this.paperMin;
             this.nextLine();
         }
-        //translate moveable type container to current position
+        //translate moveable type container to new position
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
-        //translate displayed text to paper position
-        // const paperY = Number(transform[1].split(")")[0]);
-        const textOffet = this.centerX + this.currentPos;
-        this.displayedText.style.transform = "translate("+textOffet+"px,"+this.centerY+"px)";
     }
     depressKey = (key) => {
         console.log(key);
         key = key.toLowerCase();
         if(this.keys[key]){
             const keyObj = this.keys[key]['obj'];
-            console.log(keyObj);
             const keyPos = this.keys[key]['pos'];
-            console.log(keyPos);
             const offsetY = keyPos.y+3
+            //offset key
             keyObj.style.transform = "translate("+keyPos.x+"px,"+offsetY+"px)";
             this.ribbon.style.opacity = 1;
             setTimeout(()=>{
+                //after timeout, return key to default position
                 keyObj.style.transform = "translate("+keyPos.x+"px,"+keyPos.y+"px)";
                 this.ribbon.style.opacity = 0;
             },100)
-            console.log(keyObj);
+            // console.log(keyObj);
         } else {
             console.log('keyObj not found');
         }
@@ -114,20 +115,32 @@ class Typewriter{
     nextLine = () => {
         console.log('new line');
         //ding!
-        this.audio.bell.play();
+        console.log(this.paper);
+        // this.audio.bell.play();
         this.paperHeight += .1;
-        this.currentPage.push(this.currentLine);
-        this.currentLine = "";
-        this.print(this.currentLine);
-        const paperY = -9*this.paperHeight;
-        this.paper.style.transform = "translate(0,"+paperY+"px) scale(1,"+this.paperHeight+")";
-        
+        this.currentPage.push(this.currentText);
+        this.currentText = "";
+        if(this.currentLine + 1 > this.maxLinesOnPages){
+            this.newPage();
+            this.currentLine = 0;
+        } else {
+            this.currentLine += 1;
+        }
+        this.print(this.currentText);
+        this.paper.style.transform = " translate("+0+"px,"+-10*this.paperHeight+"px)";
+        console.log(this.paper);
+    }
+    nextPage = () => {
+        console.log('new page');
     }
     updateCurrentText = () => {
         console.log('updating current text')
     }
     print = (text) => {
         console.log(text);
-        this.text.textContent = text;
+        //select active text container
+        const textContainer = this.textLines[this.currentLine];
+        textContainer.textContent = text;
+        // this.text.textContent = text;
     }
 }
