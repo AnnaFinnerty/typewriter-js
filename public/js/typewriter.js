@@ -73,7 +73,6 @@ class Typewriter{
         //temp fix until correct way of getting offset can be determined
         this.paperMax = this.paperMin + width * -1;
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
-        // this.displayedText.style.transform = "translate("+this.centerX+"px,"+this.centerY+"px)";
     }
     type = (key,time) => {
         //MTC use time to play sound
@@ -127,8 +126,7 @@ class Typewriter{
             this.currentLine += 1;
         }
         this.print(this.currentText);
-        this.paper.style.transform = " translate("+0+"px,"+-10*this.paperHeight+"px)";
-        console.log(this.paper);
+        this.paper.style.transform = " translate("+0+"px,"+-8*(this.currentLine-1)+"px)";
     }
     nextPage = () => {
         console.log('new page');
