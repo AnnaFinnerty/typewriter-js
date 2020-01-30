@@ -9,7 +9,8 @@ class Audio{
         this.volumeButton = document.querySelector('#volume-button');
         this.volumeButton.addEventListener('click',this.toggleMute)
     }
-    toggleVolume = () => {
+    toggleMute = () => {
+        console.log('toggling mute!');
         this.muted = ! this.muted;
     }
     ding = () => {

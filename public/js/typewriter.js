@@ -104,7 +104,6 @@ class Typewriter{
                 keyObj.style.transform = "translate("+keyPos.x+"px,"+keyPos.y+"px)";
                 this.ribbon.style.opacity = 0;
             },100)
-            // console.log(keyObj);
         } else {
             console.log('keyObj not found');
         }
@@ -113,6 +112,8 @@ class Typewriter{
         console.log('new line');
         //ding!
         this.audio.ding();
+        this.currentPos = this.paperMin;
+        this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
         this.paperHeight += .1;
         this.currentPage.push(this.currentText);
         this.currentText = "";
