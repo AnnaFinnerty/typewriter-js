@@ -1,6 +1,6 @@
 class Typewriter{
     constructor(){
-        this.input = new Input(this.type,this.nextLine,this.depressKey);
+        this.input = new Input(this.type,this.nextLine,this.depressKey,this.tab);
         this.audio = new Audio(); 
         this.typewriter = document.getElementById('typewriter').getSVGDocument();
         this.charWidth = 5;
@@ -95,7 +95,20 @@ class Typewriter{
         if(this.keys[key]){
             const keyObj = this.keys[key]['obj'];
             const keyPos = this.keys[key]['pos'];
+            //offset height 
             const offsetY = keyPos.y+3
+            let hammerObj = null;
+            //check for the hammer
+            if(this.hammers[key]){
+                hammerObj = this.hammers[key]['obj'];
+                console.log(hammerObj);
+                if(hammerObj){
+                    hammerObj.style.opacity = 0;
+                }
+                
+            } else {
+                console.log('hammerobj not fount')
+            }
             //offset key
             keyObj.style.transform = "translate("+keyPos.x+"px,"+offsetY+"px)";
             this.ribbon.style.opacity = 1;
@@ -103,14 +116,16 @@ class Typewriter{
                 //after timeout, return key to default position
                 keyObj.style.transform = "translate("+keyPos.x+"px,"+keyPos.y+"px)";
                 this.ribbon.style.opacity = 0;
+                if(hammerObj){
+                    hammerObj.style.opacity = 1;
+                }
             },100)
         } else {
             console.log('keyObj not found');
         }
+        
     }
     nextLine = () => {
-        console.log('new line');
-        //ding!
         this.audio.ding();
         this.currentPos = this.paperMin;
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
@@ -133,8 +148,15 @@ class Typewriter{
             this.textLines[i].textContent = "";
         }
     }
+    tab = (timeSinceLastKeyStroke) => {
+        console.log('tabbbinnnggg');
+        this.currentText += "   ";
+        this.depressKey('tab');
+        this.currentChar += 3;
+        this.currentPos -= 3*this.charWidth;
+        this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
+    }
     print = (text) => {
-        console.log(text);
         //select active text container
         const textContainer = this.textLines[this.currentLine];
         textContainer.textContent = text;

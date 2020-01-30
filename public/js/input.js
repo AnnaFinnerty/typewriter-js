@@ -1,9 +1,10 @@
 class Input{
-    constructor(addToTextString,nextLine,depressKey){
+    constructor(addToTextString,nextLine,depressKey,tab){
         //index of keyboard keys that create an action -- everything else gets passed to text
         this.addToTextString = addToTextString;
         this.nextLine = nextLine;
         this.depressKey = depressKey;
+        this.tab = tab;
         this.timeSinceLastKeyStroke = 1000;
         this.specialKeys = {
             'Enter' : this.enter,
@@ -73,8 +74,7 @@ class Input{
         this.depressKey('space');
     }
     tab = () => {
-        this.addToTextString("     ",this.timeSinceLastKeyStroke);
-        this.depressKey('tab');
+        this.tab(this.timeSinceLastKeyStroke);
     }
     shift = () => {
        this.shift = true;
