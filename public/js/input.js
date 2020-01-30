@@ -14,7 +14,8 @@ class Input{
             'ArrowRight': this.rerouteKeyVal,
             'ArrowLeft': this.rerouteKeyVal,
             'ArrowUp': this.rerouteKeyVal,
-            'ArrowDown': this.rerouteKeyVal
+            'ArrowDown': this.rerouteKeyVal,
+            'Meta': this.rerouteKeyVal
         }
         this.shift = false;
         this.awake();
@@ -36,12 +37,17 @@ class Input{
             })
         }
     }
+    startTimer = () => {
+        this.interval = setInterval(()=>{
+            this.timeSinceLastKeyStroke += 1;
+        },100)
+    }
     clickInput = (id) => {
         const key = id.split('-')[0];
         this.userInput(key);
     }
     userInput = (key) => {
-        console.log('user input: ' + key);
+        this.timeSinceLastKeyStroke = 0;
         if(this.specialKeys[key]){
             console.log('this is a special key!');
             const f = this.specialKeys[key];
