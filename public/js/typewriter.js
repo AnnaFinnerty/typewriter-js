@@ -1,6 +1,7 @@
 class Typewriter{
     constructor(){
-        this.input = new Input(this.type,this.nextLine,this.depressKey); 
+        this.input = new Input(this.type,this.nextLine,this.depressKey,this.tab);
+        this.audio = new Audio(); 
         this.typewriter = document.getElementById('typewriter').getSVGDocument();
         this.charWidth = 5;
         this.currentPos = 0;
@@ -8,30 +9,19 @@ class Typewriter{
         this.movableOnType = this.typewriter.getElementById('layer18');
         this.paper = this.typewriter.getElementById('paper');
         this.ribbon = this.typewriter.getElementById('ribbon');
-        this.textContainer = this.typewriter.getElementById('text');
-        this.textContainer.width = "100px";
-        this.text = this.textContainer.lastChild;
-        this.text.style.fontFamily = "'Special Elite', 'Courier',serif";
-        this.text.textContent = "test text";
-        this.currentLine = "";
+        this.currentText = "";
+        this.currentLine = 0;
         this.currentChar = 0;
         this.maxChars = 14;
         this.currentPage = [];
-        this.maxLinesOnPages = 25;
-        this.textPosition = {
-            x: "50vw",
-            y: "70vh"
-        }
+        this.maxLinesOnPages = 15;
         this.keys = {}
         this.hammers = {}
-        this.audio = {
-            'bell': document.querySelector('#bell')
-        }
-        // this.displayedText = document.querySelector('#text-container');
+        this.textLines = []
         this.awake();
     }
     awake(){
-        //find keysObjs in svg and store ref and position calc in keys obj
+        //find keysObjs and hammerObjs in svg and store ref and position calc in keys obj
         for(let i = 0; i < activeKeys.length; i++){
             const keyObj = this.typewriter.getElementById(activeKeys[i]+"-key");
             this.keys[activeKeys[i]] = {};
@@ -43,91 +33,132 @@ class Typewriter{
                 x: keyX,
                 y: keyY
             }
+            try{
+                const hammerObj = this.typewriter.getElementById(activeKeys[i]+"-hammer");
+                // if(hammerObj){
+                //     console.log(hammerObj);
+                // }
+                this.hammers[activeKeys[i]] = {};
+                this.hammers[activeKeys[i]]['obj'] = hammerObj;
+                const hTransform = hammerObj.getAttribute("transform").split(",");
+                const hammerX = Number(hTransform[0].split("(")[1]);
+                const hammerY = Number(hTransform[1].split(")")[0]);
+                this.hammers[activeKeys[i]]['pos'] = {
+                    x: hammerX,
+                    y: hammerY
+                }
+            }catch(e){}
         }
 
-        //find start position for text container
-        // console.log(this.paper);
-        // const transform = this.paper.getAttribute("x");
-        // const paperX = Number(transform);
-        // console.log('paperX',paperX)
+        //store location text lines on paper, set text and color
+        for(let i = 0; i < this.maxLinesOnPages; i++){
+            const textObj = this.typewriter.getElementById('text'+i).firstChild;
+            //remove filler content (not need for code but useful for SVG placement)
+            textObj.textContent = "";
+            console.log(textObj);
+            textObj.style.fontFamily = "'Special Elite', 'Courier',serif";
+            textObj.style.textSize = "12px";
+            textObj.style.fill = "black";
+            textObj.style.stroke = "black";
+            this.textLines.push(textObj)
+        }
 
         this.centerX = window.innerWidth/2;
         this.centerY = window.innerHeight/2 - 40;
-
-        const paperX = Number(this.paper.getAttribute("x"));
-        // const paperWidth = Number(this.paper.getAttribute("width"));
-        const paperY = Number(this.paper.getAttribute("y"));
-        // const paperHeight = Number(this.paper.getAttribute("height"));
        
-        // this.displayedText.style.width = paperWidth + "px";
-        // this.displayedText.style.height = paperHeight + "px";
-
-        this.paperMin = Number(this.paper.getAttribute("x")) *.45;
+        this.paperMin = 40;
         this.currentPos = this.paperMin;
         const width = Number(this.paper.getAttribute("width"));
         //temp fix until correct way of getting offset can be determined
         this.paperMax = this.paperMin + width * -1;
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
-        // this.displayedText.style.transform = "translate("+this.centerX+"px,"+this.centerY+"px)";
     }
     type = (key,time) => {
-        //use time to play sound
-        console.log('typing!');
+        //MTC use time to play sound
+        this.audio.type(time);
         if(this.currentChar - 1 <= this.maxChars){
             this.currentChar += 1;
             this.currentPos -= this.charWidth;
-            this.currentLine += key;
+            this.currentText += key;
             this.depressKey(key);
-            this.print(this.currentLine);
+            this.print(this.currentText);
         } else {
             this.currentChar = 0;
             this.currentPos = this.paperMin;
             this.nextLine();
         }
-        //translate moveable type container to current position
+        //translate moveable type container to new position
         this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
-        //translate displayed text to paper position
-        // const paperY = Number(transform[1].split(")")[0]);
-        const textOffet = this.centerX + this.currentPos;
-        this.displayedText.style.transform = "translate("+textOffet+"px,"+this.centerY+"px)";
     }
     depressKey = (key) => {
-        console.log(key);
         key = key.toLowerCase();
         if(this.keys[key]){
             const keyObj = this.keys[key]['obj'];
-            console.log(keyObj);
             const keyPos = this.keys[key]['pos'];
-            console.log(keyPos);
+            //offset height 
             const offsetY = keyPos.y+3
+            let hammerObj = null;
+            //check for the hammer
+            if(this.hammers[key]){
+                hammerObj = this.hammers[key]['obj'];
+                console.log(hammerObj);
+                if(hammerObj){
+                    hammerObj.style.opacity = 0;
+                }
+                
+            } else {
+                console.log('hammerobj not fount')
+            }
+            //offset key
             keyObj.style.transform = "translate("+keyPos.x+"px,"+offsetY+"px)";
             this.ribbon.style.opacity = 1;
             setTimeout(()=>{
+                //after timeout, return key to default position
                 keyObj.style.transform = "translate("+keyPos.x+"px,"+keyPos.y+"px)";
                 this.ribbon.style.opacity = 0;
+                if(hammerObj){
+                    hammerObj.style.opacity = 1;
+                }
             },100)
-            console.log(keyObj);
         } else {
             console.log('keyObj not found');
         }
-    }
-    nextLine = () => {
-        console.log('new line');
-        //ding!
-        this.audio.bell.play();
-        this.paperHeight += .1;
-        this.currentPage.push(this.currentLine);
-        this.currentLine = "";
-        this.print(this.currentLine);
-        const paperY = -9*this.paperHeight;
-        this.paper.style.transform = "translate(0,"+paperY+"px) scale(1,"+this.paperHeight+")";
         
     }
-    updateCurrentText = () => {
-        console.log('updating current text')
+    nextLine = () => {
+        this.audio.ding();
+        this.currentPos = this.paperMin;
+        this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
+        this.paperHeight += .1;
+        this.currentPage.push(this.currentText);
+        this.currentText = "";
+        if(this.currentLine + 1 >= this.maxLinesOnPages){
+            this.nextPage();
+        } else {
+            this.currentLine += 1;
+            this.print(this.currentText);
+            this.paper.style.transform = " translate("+0+"px,"+-8*(this.currentLine)+"px)";
+        }
+    }
+    nextPage = () => {
+        this.currentLine = 0;
+        this.currentPos = this.paperMin;
+        this.paper.style.transform = " translate("+0+"px,"+-8*(this.currentLine-1)+"px)";
+        for(let i = 0; i < this.textLines.length; i++){
+            this.textLines[i].textContent = "";
+        }
+    }
+    tab = (timeSinceLastKeyStroke) => {
+        console.log('tabbbinnnggg');
+        this.currentText += "   ";
+        this.depressKey('tab');
+        this.currentChar += 3;
+        this.currentPos -= 3*this.charWidth;
+        this.movableOnType.style.transform = "translate("+this.currentPos+"px,0)";
     }
     print = (text) => {
-        console.log(text);
-        this.text.textContent = text;
+        //select active text container
+        const textContainer = this.textLines[this.currentLine];
+        textContainer.textContent = text;
     }
 }

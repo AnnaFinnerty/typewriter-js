@@ -34,18 +34,10 @@ h1{
     align-content: center;
 }
 
-/* #text-container{
-   position: absolute;
-   background: red;
-   height: 50vh;
-   margin-top: -50vh;
-   width:20%
-} */
-
 #typewriter{
     margin: 0 auto;
-    width: 50vw;
-    height: 50%;
+    width: 70vw;
+    height: 70%;
 }
 
 .hidden{
@@ -53,9 +45,12 @@ h1{
 }
 
 .icon{
-    width: 5vw;
-    height: 5vw;
+    font-size: 5vw;
     color: white;
     padding: 1vw;
     margin: 1vw;
+}
+
+.icon:hover{
+    color:gray;
 }
